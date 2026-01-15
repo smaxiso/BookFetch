@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 import img2pdf
+from PIL import Image
 
 from bookfetch.utils.exceptions import ConversionError
 from bookfetch.utils.logger import get_logger
@@ -34,6 +35,24 @@ def create_pdf_from_images(
         ConversionError: If PDF creation fails
     """
     try:
+        # Validate images before conversion
+        valid_images = []
+        for img_path in image_paths:
+            try:
+                with Image.open(img_path) as img:
+                    img.verify()  # Verify integrity
+                valid_images.append(img_path)
+            except Exception as e:
+                logger.warning(f"Skipping corrupt/invalid image {img_path.name}: {e}")
+
+        if not valid_images:
+            raise ConversionError("No valid images found to create PDF")
+
+        if len(valid_images) < len(image_paths):
+            logger.warning(
+                f"Skipped {len(image_paths) - len(valid_images)} invalid images out of {len(image_paths)}"
+            )
+
         # Prepare PDF metadata
         pdfmeta = {}
 
@@ -55,9 +74,7 @@ def create_pdf_from_images(
                 pdfmeta["title"] = metadata["title"]
 
             # Author
-            if "creator" in metadata and "associated-names" in metadata:
-                pdfmeta["author"] = metadata["creator"] + "; " + metadata["associated-names"]
-            elif "creator" in metadata:
+            if "creator" in metadata:
                 pdfmeta["author"] = metadata["creator"]
             elif "associated-names" in metadata:
                 pdfmeta["author"] = metadata["associated-names"]
@@ -79,12 +96,20 @@ def create_pdf_from_images(
             pdfmeta["keywords"] = [f"https://archive.org/details/{book_id}"]
 
         # Convert images to PDF
-        logger.info(f"Creating PDF with {len(image_paths)} images...")
+        logger.info(f"Creating PDF with {len(valid_images)} images...")
 
         # Convert Path objects to strings
-        image_paths_str = [str(p) for p in image_paths]
+        image_paths_str = [str(p) for p in valid_images]
 
-        pdf_data = img2pdf.convert(image_paths_str, **pdfmeta)
+        try:
+            pdf_data = img2pdf.convert(image_paths_str, **pdfmeta)
+        except Exception as e:
+            # Fallback for some obscure errors (e.g. palette images)
+            logger.warning(f"Standard conversion failed: {e}. Trying raw conversion mode.")
+            # Sometimes explicit conversion to RGB helps, but img2pdf usually handles it.
+            # If img2pdf fails fundamental structure checks, we can't do much without re-encoding.
+            # For now, let's just fail with better error.
+            raise ConversionError(f"img2pdf conversion failed: {e}") from e
 
         # Write PDF file
         with open(output_path, "wb") as f:
