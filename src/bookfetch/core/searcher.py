@@ -47,7 +47,7 @@ class ArchiveSearcher:
                 "collection",
             ]
 
-            results = []
+            results: list[SearchResult] = []
             # Use 'params' to support pagination directly via internetarchive
             params = {"page": page, "rows": limit}
             search = search_items(full_query, fields=fields, params=params)

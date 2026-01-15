@@ -20,7 +20,7 @@ class AuthCredentials:
     email: str
     password: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate credentials."""
         if not self.email or not self.password:
             from bookfetch.utils.exceptions import ValidationError

@@ -1,5 +1,7 @@
 """Authentication module for Archive.org using official library."""
 
+from typing import Any, Optional
+
 from internetarchive import get_session
 
 from bookfetch.core.models import AuthCredentials
@@ -14,7 +16,7 @@ class ArchiveAuthenticator:
 
     def __init__(self) -> None:
         """Initialize authenticator."""
-        self.ia_session = None
+        self.ia_session: Optional[Any] = None
 
     def login(self, credentials: AuthCredentials):
         """Login to Archive.org using official library.
