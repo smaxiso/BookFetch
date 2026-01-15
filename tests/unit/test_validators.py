@@ -1,18 +1,17 @@
 """Unit tests for validators module."""
 
 import pytest
-from pathlib import Path
 
+from bookfetch.utils.exceptions import ValidationError
 from bookfetch.utils.validators import (
+    extract_book_id,
+    sanitize_filename,
     validate_archive_url,
     validate_archive_urls,
-    sanitize_filename,
     validate_email,
     validate_resolution,
     validate_threads,
-    extract_book_id,
 )
-from bookfetch.utils.exceptions import ValidationError
 
 
 class TestURLValidation:
