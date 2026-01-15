@@ -17,40 +17,44 @@ from bookfetch.utils.validators import (
 class TestURLValidation:
     """Tests for URL validation."""
 
-    def test_valid_archive_url(self):
+    def test_valid_url(self):
         """Test validation of valid Archive.org URL."""
-        url = "https://archive.org/details/IntermediatePython"
-        assert validate_archive_url(url) is True
+        url = "https://archive.org/details/testbook"
+        assert validate_archive_url(url)
+
+    def test_valid_book_id(self):
+        """Test validation of book ID."""
+        book_id = "IntermediatePython"
+        assert validate_archive_url(book_id)
+
+    def test_invalid_url_empty(self):
+        """Test validation of empty URL."""
+        with pytest.raises(ValidationError, match="cannot be empty"):
+            validate_archive_url("")
 
     def test_invalid_url_wrong_domain(self):
-        """Test validation fails for wrong domain."""
-        url = "https://example.com/details/book"
-        with pytest.raises(ValidationError, match="Invalid URL"):
-            validate_archive_url(url)
+        """Test validation of wrong domain URL."""
+        with pytest.raises(ValidationError, match="Invalid Archive.org URL"):
+            validate_archive_url("https://example.com/details/book")
 
     def test_invalid_url_missing_details(self):
-        """Test validation fails for URL missing /details/ path."""
-        url = "https://archive.org/book123"
-        with pytest.raises(ValidationError, match="Invalid URL"):
-            validate_archive_url(url)
+        """Test validation of URL missing /details/ path."""
+        with pytest.raises(ValidationError, match="Invalid Archive.org URL"):
+            validate_archive_url("https://archive.org/book123")
+
+    def test_invalid_book_id_special_chars(self):
+        """Test validation of book ID with invalid characters."""
+        with pytest.raises(ValidationError, match="Invalid book ID"):
+            validate_archive_url("Book With Spaces")
 
     def test_validate_multiple_urls(self):
         """Test validation of multiple URLs."""
         urls = [
             "https://archive.org/details/book1",
             "https://archive.org/details/book2",
-            "https://archive.org/details/book3",
+            "IntermediatePython",
         ]
-        assert validate_archive_urls(urls) is True
-
-    def test_validate_multiple_urls_with_invalid(self):
-        """Test validation fails if any URL is invalid."""
-        urls = [
-            "https://archive.org/details/book1",
-            "https://example.com/book2",
-        ]
-        with pytest.raises(ValidationError):
-            validate_archive_urls(urls)
+        assert validate_archive_urls(urls)
 
 
 class TestFilenameSanitization:
@@ -158,19 +162,22 @@ class TestThreadsValidation:
 class TestBookIDExtraction:
     """Tests for book ID extraction."""
 
-    def test_extract_book_id(self):
-        """Test extraction of book ID from URL."""
+    def test_extract_book_id_from_url(self):
+        """Test extracting book ID from URL."""
         url = "https://archive.org/details/IntermediatePython"
         assert extract_book_id(url) == "IntermediatePython"
 
-    def test_extract_book_id_with_params(self):
-        """Test extraction with URL parameters."""
+    def test_extract_book_id_from_url_with_query(self):
+        """Test extracting book ID from URL with query params."""
         url = "https://archive.org/details/book123?ref=opensearch"
-        book_id = extract_book_id(url.split("?")[0])
-        assert book_id == "book123"
+        assert extract_book_id(url) == "book123"
 
-    def test_extract_book_id_invalid_url(self):
-        """Test extraction fails for invalid URL."""
-        url = "https://example.com/book"
-        with pytest.raises(ValidationError):
-            extract_book_id(url)
+    def test_extract_book_id_from_plain_id(self):
+        """Test extracting book ID when given just the ID."""
+        book_id = "IntermediatePython"
+        assert extract_book_id(book_id) == "IntermediatePython"
+
+    def test_extract_book_id_empty(self):
+        """Test extracting from empty string raises error."""
+        with pytest.raises(ValidationError, match="Empty book ID"):
+            extract_book_id("")

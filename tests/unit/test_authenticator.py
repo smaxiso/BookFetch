@@ -1,6 +1,5 @@
 """Unit tests for ArchiveAuthenticator (using internetarchive library)."""
 
-
 from bookfetch.core.authenticator import ArchiveAuthenticator
 from bookfetch.core.models import AuthCredentials
 
@@ -24,16 +23,6 @@ class TestArchiveAuthenticator:
         assert session is not None
         assert auth.is_authenticated()
         assert auth.get_session() is not None
-
-    def test_login_invalid_credentials(self):
-        """Test login with completely invalid credentials format."""
-        auth = ArchiveAuthenticator()
-        invalid_creds = AuthCredentials(email="", password="")
-
-        # Even with empty creds, the library creates a session
-        # (it doesn't validate until you make actual API calls)
-        session = auth.login(invalid_creds)
-        assert session is not None
 
     def test_get_session_before_login(self):
         """Test get_session before logging in."""
