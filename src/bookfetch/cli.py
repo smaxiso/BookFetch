@@ -2,7 +2,7 @@
 
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import click
 
@@ -141,7 +141,7 @@ def download(
             sys.exit(1)
 
         # Get URLs
-        url_list: List[str] = list(urls)
+        url_list: list[str] = list(urls)
 
         if url_file:
             with open(url_file) as f:

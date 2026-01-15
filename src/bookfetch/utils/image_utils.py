@@ -1,7 +1,6 @@
 """Image processing utilities."""
 
 from pathlib import Path
-from typing import List
 
 
 def generate_image_filename(page_num: int, total_pages: int, directory: Path) -> Path:
@@ -28,7 +27,7 @@ def generate_image_filename(page_num: int, total_pages: int, directory: Path) ->
     return directory / filename
 
 
-def get_image_files(directory: Path, total_pages: int) -> List[Path]:
+def get_image_files(directory: Path, total_pages: int) -> list[Path]:
     """Get list of all downloaded image files in order.
 
     Args:

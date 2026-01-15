@@ -2,7 +2,6 @@
 
 import re
 from pathlib import Path
-from typing import List
 
 from bookfetch.config.constants import FORBIDDEN_CHARS, MAX_FILENAME_LENGTH
 from bookfetch.utils.exceptions import ValidationError
@@ -27,7 +26,7 @@ def validate_archive_url(url: str) -> bool:
     return True
 
 
-def validate_archive_urls(urls: List[str]) -> bool:
+def validate_archive_urls(urls: list[str]) -> bool:
     """Validate multiple Archive.org URLs.
 
     Args:

@@ -3,7 +3,7 @@
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 import img2pdf
 
@@ -14,9 +14,9 @@ logger = get_logger(__name__)
 
 
 def create_pdf_from_images(
-    image_paths: List[Path],
+    image_paths: list[Path],
     output_path: Path,
-    metadata: Optional[Dict] = None,
+    metadata: Optional[dict] = None,
     book_id: Optional[str] = None,
 ) -> Path:
     """Create PDF from list of image files with metadata.

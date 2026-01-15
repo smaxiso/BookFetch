@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 
 class OutputFormat(str, Enum):
@@ -30,8 +30,8 @@ class Book:
     book_id: str
     title: str
     pages: int
-    image_links: List[str] = field(default_factory=list)
-    metadata: Optional[Dict] = None
+    image_links: list[str] = field(default_factory=list)
+    metadata: Optional[dict] = None
 
     @property
     def safe_title(self) -> str:

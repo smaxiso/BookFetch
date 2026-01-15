@@ -4,7 +4,6 @@ import json
 import time
 from concurrent import futures
 from pathlib import Path
-from typing import List
 
 import requests
 from tqdm import tqdm
@@ -175,7 +174,7 @@ class ArchiveDownloader:
             except Exception as e:
                 logger.warning(f"Failed to return book: {e}")
 
-    def _download_images(self, book: Book, directory: Path) -> List[Path]:
+    def _download_images(self, book: Book, directory: Path) -> list[Path]:
         """Download all images for a book using multi-threading.
 
         Args:

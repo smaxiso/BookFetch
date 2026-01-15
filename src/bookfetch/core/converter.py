@@ -2,7 +2,7 @@
 
 import warnings
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 from bs4 import BeautifulSoup
 from ebooklib import epub
@@ -122,7 +122,7 @@ class ImageToPDFConverter:
         self._create_pdf = create_pdf_from_images
 
     def convert(
-        self, image_paths: List[Path], output_path: Path, metadata: Optional[Dict] = None
+        self, image_paths: list[Path], output_path: Path, metadata: Optional[dict] = None
     ) -> Path:
         """Convert images to PDF.
 
