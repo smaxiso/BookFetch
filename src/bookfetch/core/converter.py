@@ -103,13 +103,13 @@ class EPUBConverter:
             logger.info(f"Successfully converted to: {pdf_path}")
             return pdf_path
 
-        except FileNotFoundError:
-            raise ConversionError(f"EPUB file not found: {epub_path}")
-        except PermissionError:
-            raise ConversionError("Permission denied when accessing files")
+        except FileNotFoundError as e:
+            raise ConversionError(f"EPUB file not found: {epub_path}") from e
+        except PermissionError as e:
+            raise ConversionError("Permission denied when accessing files") from e
         except Exception as e:
             logger.error(f"Conversion failed: {e}")
-            raise ConversionError(f"Failed to convert EPUB to PDF: {e}")
+            raise ConversionError(f"Failed to convert EPUB to PDF: {e}") from e
 
 
 class ImageToPDFConverter:
