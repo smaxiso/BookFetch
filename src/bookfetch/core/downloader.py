@@ -42,7 +42,7 @@ class ArchiveDownloader:
         """Extract book information from Archive.org URL.
 
         Args:
-            url: Archive.org book URL
+            url: Archive.org book URL or book ID
 
         Returns:
             Book object with metadata and image links
@@ -50,6 +50,10 @@ class ArchiveDownloader:
         Raises:
             DownloadError: If book info cannot be retrieved
         """
+        # Convert book ID to full URL if needed
+        if not url.startswith("http"):
+            url = f"https://archive.org/details/{url}"
+            
         logger.info(f"Fetching book information from: {url}")
 
         try:
