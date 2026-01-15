@@ -2,6 +2,7 @@
 
 from bookfetch.core.authenticator import ArchiveAuthenticator
 
+
 class TestArchiveAuthenticator:
     """Test cases for ArchiveAuthenticator."""
 
