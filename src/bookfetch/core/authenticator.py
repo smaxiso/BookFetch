@@ -6,7 +6,7 @@ from typing import Optional
 
 import requests
 
-from bookfetch.config.constants import ARCHIVE_BASE_URL, ARCHIVE_LOGIN_URL
+from bookfetch.config.constants import ARCHIVE_LOGIN_URL
 from bookfetch.core.models import AuthCredentials
 from bookfetch.utils.exceptions import AuthenticationError, InvalidCredentialsError
 from bookfetch.utils.logger import get_logger

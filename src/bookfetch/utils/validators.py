@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import List
 
-from bookfetch.config.constants import ARCHIVE_DETAILS_URL, FORBIDDEN_CHARS, MAX_FILENAME_LENGTH
+from bookfetch.config.constants import FORBIDDEN_CHARS, MAX_FILENAME_LENGTH
 from bookfetch.utils.exceptions import ValidationError
 
 

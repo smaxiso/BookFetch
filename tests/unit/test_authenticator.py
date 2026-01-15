@@ -1,8 +1,9 @@
 """Unit tests for ArchiveAuthenticator."""
 
+from unittest.mock import Mock, patch
+
 import pytest
 import requests
-from unittest.mock import Mock, patch
 
 from bookfetch.core.authenticator import ArchiveAuthenticator
 from bookfetch.utils.exceptions import AuthenticationError, InvalidCredentialsError

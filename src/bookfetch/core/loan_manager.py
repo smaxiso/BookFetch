@@ -1,6 +1,5 @@
 """Loan management module for Archive.org books."""
 
-from typing import Optional
 
 import requests
 

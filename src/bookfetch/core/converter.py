@@ -106,7 +106,7 @@ class EPUBConverter:
         except FileNotFoundError:
             raise ConversionError(f"EPUB file not found: {epub_path}")
         except PermissionError:
-            raise ConversionError(f"Permission denied when accessing files")
+            raise ConversionError("Permission denied when accessing files")
         except Exception as e:
             logger.error(f"Conversion failed: {e}")
             raise ConversionError(f"Failed to convert EPUB to PDF: {e}")

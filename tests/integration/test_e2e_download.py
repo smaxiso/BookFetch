@@ -1,12 +1,14 @@
 """Integration tests for end-to-end download workflow."""
 
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-from pathlib import Path
 import requests
+
 from bookfetch.core.authenticator import ArchiveAuthenticator
 from bookfetch.core.downloader import ArchiveDownloader
 from bookfetch.core.models import AuthCredentials, DownloadConfig, OutputFormat
+from bookfetch.utils.exceptions import DownloadError, InvalidCredentialsError
 
 
 class TestE2EDownload:
@@ -155,7 +157,7 @@ class TestE2EDownload:
 
         authenticator = ArchiveAuthenticator()
 
-        with pytest.raises(Exception):  # Should raise InvalidCredentialsError
+        with pytest.raises(InvalidCredentialsError):
             authenticator.login(auth_credentials)
 
         assert not authenticator.is_authenticated()
@@ -167,5 +169,5 @@ class TestE2EDownload:
         # Mock network error
         mock_session.get.side_effect = requests.RequestException("Not found")
 
-        with pytest.raises(Exception):  # Should raise DownloadError
+        with pytest.raises(DownloadError):
             downloader.get_book_info("https://archive.org/details/nonexistent")

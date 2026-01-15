@@ -14,7 +14,7 @@ from bookfetch.core.downloader import ArchiveDownloader
 from bookfetch.core.models import AuthCredentials, DownloadConfig, OutputFormat
 from bookfetch.utils.exceptions import BookFetchError
 from bookfetch.utils.logger import setup_logger
-from bookfetch.utils.validators import extract_book_id, validate_archive_urls
+from bookfetch.utils.validators import validate_archive_urls
 
 
 @click.group()
@@ -64,19 +64,19 @@ def cli(ctx: click.Context, verbose: bool) -> None:
 @click.option(
     "-r",
     "--resolution",
-    help=f"Image resolution (0-10, 0=highest quality) [default: from config or 3]",
+    help="Image resolution (0-10, 0=highest quality) [default: from config or 3]",
     type=click.IntRange(0, 10),
 )
 @click.option(
     "-t",
     "--threads",
-    help=f"Number of download threads [default: from config or 50]",
+    help="Number of download threads [default: from config or 50]",
     type=click.IntRange(1, 200),
 )
 @click.option(
     "-d",
     "--output-dir",
-    help=f"Output directory [default: from config or ./downloads]",
+    help="Output directory [default: from config or ./downloads]",
     type=click.Path(path_type=Path),
 )
 @click.option(
@@ -144,7 +144,7 @@ def download(
         url_list: List[str] = list(urls)
 
         if url_file:
-            with open(url_file, "r") as f:
+            with open(url_file) as f:
                 file_urls = [line.strip() for line in f if line.strip()]
                 url_list.extend(file_urls)
 
@@ -248,7 +248,7 @@ def convert(ctx: click.Context, epub_file: Path, pdf_file: Optional[Path]) -> No
     try:
         verbose = ctx.obj.get("verbose", False)
 
-        click.echo(f"📚 Converting EPUB to PDF...")
+        click.echo("📚 Converting EPUB to PDF...")
         click.echo(f"📄 Input: {epub_file}")
 
         converter = EPUBConverter()

@@ -4,7 +4,7 @@ import json
 import time
 from concurrent import futures
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List
 
 import requests
 from tqdm import tqdm
@@ -15,7 +15,11 @@ from bookfetch.core.models import Book, DownloadConfig, OutputFormat
 from bookfetch.utils.exceptions import DownloadError
 from bookfetch.utils.image_utils import generate_image_filename, get_image_files
 from bookfetch.utils.logger import get_logger
-from bookfetch.utils.pdf_utils import cleanup_temp_directory, create_pdf_from_images, get_unique_output_path
+from bookfetch.utils.pdf_utils import (
+    cleanup_temp_directory,
+    create_pdf_from_images,
+    get_unique_output_path,
+)
 from bookfetch.utils.validators import sanitize_filename
 
 logger = get_logger(__name__)
