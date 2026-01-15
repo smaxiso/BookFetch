@@ -4,6 +4,7 @@ import json
 import time
 from concurrent import futures
 from pathlib import Path
+from typing import Optional
 
 import requests
 from internetarchive import get_item
@@ -309,7 +310,7 @@ class ArchiveDownloader:
                 logger.warning(f"Failed to return book: {e}")
 
     def _download_images(
-        self, book: Book, directory: Path, token: str | None = None, on_progress=None
+        self, book: Book, directory: Path, token: Optional[str] = None, on_progress=None
     ) -> list[Path]:
         """Download all images for a book using multi-threading.
 

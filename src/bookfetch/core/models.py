@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+from typing import Optional
 
 
 class OutputFormat(str, Enum):
@@ -51,7 +52,7 @@ class Book:
 
     metadata: dict = field(default_factory=dict)
     is_restricted: bool = False
-    direct_url: str | None = None
+    direct_url: Optional[str] = None
 
     @property
     def safe_title(self) -> str:
