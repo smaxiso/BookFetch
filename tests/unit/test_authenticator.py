@@ -1,7 +1,6 @@
 """Unit tests for ArchiveAuthenticator (using internetarchive library)."""
 
 from bookfetch.core.authenticator import ArchiveAuthenticator
-from bookfetch.core.models import AuthCredentials
 
 
 class TestArchiveAuthenticator:
