@@ -104,10 +104,10 @@ class ArchiveDownloader:
 
         except (IndexError, KeyError, ValueError) as e:
             logger.error(f"Failed to parse book info: {e}")
-            raise DownloadError(f"Failed to extract book information: {e}")
+            raise DownloadError(f"Failed to extract book information: {e}") from e
         except requests.RequestException as e:
             logger.error(f"Network error while fetching book info: {e}")
-            raise DownloadError(f"Failed to fetch book information: {e}")
+            raise DownloadError(f"Failed to fetch book information: {e}") from e
 
     def download_book(self, book: Book) -> Path:
         """Download a complete book.
@@ -170,7 +170,7 @@ class ArchiveDownloader:
             logger.error(f"Download failed: {e}")
             # Cleanup on failure
             cleanup_temp_directory(temp_dir)
-            raise DownloadError(f"Failed to download book: {e}")
+            raise DownloadError(f"Failed to download book: {e}") from e
         finally:
             # Return the book
             try:
@@ -210,7 +210,7 @@ class ArchiveDownloader:
                 tasks.append(task)
 
             # Wait for all downloads with progress bar
-            for task in tqdm(futures.as_completed(tasks), total=len(tasks), desc="Downloading"):
+            for _task in tqdm(futures.as_completed(tasks), total=len(tasks), desc="Downloading"):
                 pass
 
         # Get list of downloaded images

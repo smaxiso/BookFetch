@@ -88,7 +88,7 @@ def create_pdf_from_images(
         return output_path
 
     except Exception as e:
-        raise ConversionError(f"Failed to create PDF: {e}")
+        raise ConversionError(f"Failed to create PDF: {e}") from e
 
 
 def get_unique_output_path(base_path: Path, directory: Optional[Path] = None) -> Path:

@@ -65,7 +65,7 @@ class LoanManager:
 
         except requests.RequestException as e:
             logger.error(f"Failed to browse book: {e}")
-            raise LoanError(f"Failed to borrow book {book_id}: {e}")
+            raise LoanError(f"Failed to borrow book {book_id}: {e}") from e
 
         # Create token
         data["action"] = "create_token"
@@ -85,7 +85,7 @@ class LoanManager:
 
         except requests.RequestException as e:
             logger.error(f"Failed to create token: {e}")
-            raise LoanError(f"Failed to borrow book {book_id}: {e}")
+            raise LoanError(f"Failed to borrow book {book_id}: {e}") from e
 
     def return_book(self, book_id: str) -> None:
         """Return a borrowed book.
@@ -112,4 +112,4 @@ class LoanManager:
 
         except requests.RequestException as e:
             logger.error(f"Failed to return book: {e}")
-            raise LoanError(f"Failed to return book {book_id}: {e}")
+            raise LoanError(f"Failed to return book {book_id}: {e}") from e
