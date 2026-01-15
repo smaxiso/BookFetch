@@ -1,6 +1,5 @@
 """Loan management module for Archive.org books."""
 
-
 import requests
 
 from bookfetch.config.constants import ARCHIVE_LOAN_URL, ARCHIVE_SEARCH_INSIDE_URL
@@ -55,7 +54,10 @@ class LoanManager:
             if response.status_code == 400:
                 error_msg = response.json().get("error", "Unknown error")
 
-                if error_msg == "This book is not available to borrow at this time. Please try again later.":
+                if (
+                    error_msg
+                    == "This book is not available to borrow at this time. Please try again later."
+                ):
                     logger.info("This book doesn't need to be borrowed")
                     return self.session
                 else:

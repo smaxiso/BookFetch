@@ -1,6 +1,5 @@
 """Authentication module for Archive.org using official library."""
 
-
 from internetarchive import get_session
 
 from bookfetch.core.models import AuthCredentials

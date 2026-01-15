@@ -188,7 +188,7 @@ def download(
 
         for idx, url in enumerate(url_list, 1):
             try:
-                click.echo(f"\n{'='*60}")
+                click.echo(f"\n{'=' * 60}")
                 click.echo(f"📥 Downloading book {idx}/{len(url_list)}")
                 click.echo(f"🔗 URL: {url}")
 
@@ -204,7 +204,7 @@ def download(
                 click.echo(f"❌ Failed: {e}", err=True)
                 continue
 
-        click.echo(f"\n{'='*60}")
+        click.echo(f"\n{'=' * 60}")
         click.echo("🎉 All downloads complete!")
 
     except BookFetchError as e:

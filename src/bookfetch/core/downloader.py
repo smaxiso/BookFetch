@@ -63,7 +63,9 @@ class ArchiveDownloader:
             page_content = response.text
 
             # Extract info URL from page
-            info_url = "https:" + page_content.split('"url":"')[1].split('"')[0].replace("\\u0026", "&")
+            info_url = "https:" + page_content.split('"url":"')[1].split('"')[0].replace(
+                "\\u0026", "&"
+            )
 
             # Get book data
             response = self.session.get(info_url)
@@ -255,7 +257,9 @@ class ArchiveDownloader:
                         f.write(response.content)
                     return image_path
                 else:
-                    logger.warning(f"Unexpected status code {response.status_code} for page {page_num}")
+                    logger.warning(
+                        f"Unexpected status code {response.status_code} for page {page_num}"
+                    )
                     time.sleep(RETRY_DELAY_SECONDS)
 
             except requests.RequestException as e:

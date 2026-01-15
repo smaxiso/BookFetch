@@ -99,9 +99,7 @@ class TestArchiveDownloader:
 
     def test_get_book_info_network_error(self, mock_downloader, sample_book_url):
         """Test book info extraction with network error."""
-        mock_downloader.session.get.side_effect = requests.RequestException(
-            "Connection failed"
-        )
+        mock_downloader.session.get.side_effect = requests.RequestException("Connection failed")
 
         with pytest.raises(DownloadError) as exc_info:
             mock_downloader.get_book_info(sample_book_url)
@@ -173,9 +171,7 @@ class TestArchiveDownloader:
             mock_cleanup.assert_called_once_with(temp_dir)
 
     @patch("bookfetch.core.downloader.get_unique_output_path")
-    def test_download_book_as_jpg(
-        self, mock_unique_path, mock_downloader, temp_output_dir
-    ):
+    def test_download_book_as_jpg(self, mock_unique_path, mock_downloader, temp_output_dir):
         """Test downloading a book as JPG images."""
         # Change output format to JPG
         mock_downloader.config.output_format = OutputFormat.JPG

@@ -138,4 +138,3 @@ class ImageToPDFConverter:
             ConversionError: If conversion fails
         """
         return self._create_pdf(image_paths, output_path, metadata)
-

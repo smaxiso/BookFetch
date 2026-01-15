@@ -46,7 +46,9 @@ def create_pdf_from_images(
                     elif isinstance(metadata[key], list):
                         metadata[key] = "; ".join(metadata[key])
                     else:
-                        logger.warning(f"Unsupported metadata type for {key}: {type(metadata[key])}")
+                        logger.warning(
+                            f"Unsupported metadata type for {key}: {type(metadata[key])}"
+                        )
 
             # Title
             if "title" in metadata:
@@ -63,7 +65,11 @@ def create_pdf_from_images(
             # Date
             if "date" in metadata:
                 try:
-                    date_str = metadata["date"][:4] if isinstance(metadata["date"], str) else str(metadata["date"])[:4]
+                    date_str = (
+                        metadata["date"][:4]
+                        if isinstance(metadata["date"], str)
+                        else str(metadata["date"])[:4]
+                    )
                     pdfmeta["creationdate"] = datetime.strptime(date_str, "%Y")
                 except Exception as e:
                     logger.debug(f"Could not parse date from metadata: {e}")
