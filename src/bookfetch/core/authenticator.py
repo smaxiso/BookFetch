@@ -1,11 +1,10 @@
 """Authentication module for Archive.org using official library."""
 
-from typing import Optional
 
 from internetarchive import get_session
 
 from bookfetch.core.models import AuthCredentials
-from bookfetch.utils.exceptions import AuthenticationError, InvalidCredentialsError
+from bookfetch.utils.exceptions import AuthenticationError
 from bookfetch.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -41,15 +40,15 @@ class ArchiveAuthenticator:
                     "secret": credentials.password,
                 }
             }
-            
+
             session = get_session(config=config)
-            
+
             # Test the session by making a simple request
             # The library handles authentication internally
             self.ia_session = session
             logger.info("Successfully logged in to Archive.org")
             return session
-            
+
         except Exception as e:
             logger.error(f"Authentication failed: {e}")
             raise AuthenticationError(f"Failed to authenticate with Archive.org: {e}") from e

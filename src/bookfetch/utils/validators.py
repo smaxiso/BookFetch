@@ -9,11 +9,11 @@ from bookfetch.utils.exceptions import ValidationError
 
 def validate_archive_url(url: str) -> bool:
     """Validate Archive.org URL or book ID.
-    
+
     Accepts both:
     - Full URL: https://archive.org/details/BookID
     - Just book ID: BookID
-    
+
     Args:
         url: Archive.org URL or book ID to validate
 
@@ -25,9 +25,9 @@ def validate_archive_url(url: str) -> bool:
     """
     if not url or not url.strip():
         raise ValidationError("URL or book ID cannot be empty")
-    
+
     url = url.strip()
-    
+
     # If it looks like a URL, validate it
     if url.startswith("http://") or url.startswith("https://"):
         if "archive.org/details/" not in url:
@@ -39,7 +39,7 @@ def validate_archive_url(url: str) -> bool:
         raise ValidationError(
             f"Invalid book ID. Must contain only letters, numbers, dash, underscore, or dot. Got: {url}"
         )
-    
+
     return True
 
 
@@ -158,7 +158,7 @@ def validate_output_dir(output_dir: Path) -> bool:
 
 def extract_book_id(url: str) -> str:
     """Extract book ID from Archive.org URL or return the ID itself.
-    
+
     Supports both:
     - Full URL: https://archive.org/details/BookID → BookID
     - Just ID: BookID → BookID
@@ -174,17 +174,17 @@ def extract_book_id(url: str) -> str:
     """
     try:
         url = url.strip()
-        
+
         # If it's a URL, extract the ID
         if "archive.org/details/" in url:
             book_id = url.split("archive.org/details/")[1].split("?")[0].split("/")[0]
         else:
             # Already a book ID
             book_id = url
-        
+
         if not book_id:
             raise ValidationError("Empty book ID")
-            
+
         return book_id
     except (IndexError, ValueError) as e:
         raise ValidationError(f"Cannot extract book ID from URL {url}: {e}") from e

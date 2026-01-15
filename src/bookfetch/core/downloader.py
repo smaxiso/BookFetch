@@ -53,7 +53,7 @@ class ArchiveDownloader:
         # Convert book ID to full URL if needed
         if not url.startswith("http"):
             url = f"https://archive.org/details/{url}"
-            
+
         logger.info(f"Fetching book information from: {url}")
 
         try:
