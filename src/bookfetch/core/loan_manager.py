@@ -1,7 +1,8 @@
 """Loan management module for Archive.org books."""
 
+from typing import Optional
+
 import requests
-from typing import Optional, Tuple
 
 from bookfetch.config.constants import ARCHIVE_LOAN_URL, ARCHIVE_SEARCH_INSIDE_URL
 from bookfetch.utils.exceptions import LoanError
@@ -23,7 +24,7 @@ class LoanManager:
 
     def borrow_book(
         self, book_id: str, verbose: bool = True
-    ) -> Tuple[requests.Session, Optional[str]]:
+    ) -> tuple[requests.Session, Optional[str]]:
         """Borrow a book from Archive.org.
 
         Args:
