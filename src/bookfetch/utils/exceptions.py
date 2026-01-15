@@ -20,7 +20,7 @@ class InvalidCredentialsError(AuthenticationError):
 
 
 class DownloadError(BookFetchError):
-    """Raised when download fails."""
+    """Raised when book download fails."""
 
     pass
 
@@ -31,8 +31,14 @@ class LoanError(BookFetchError):
     pass
 
 
+class SearchError(BookFetchError):
+    """Raised when search fails."""
+
+    pass
+
+
 class ConversionError(BookFetchError):
-    """Raised when format conversion fails."""
+    """Raised when file conversion fails."""
 
     pass
 

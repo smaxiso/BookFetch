@@ -1,63 +1,15 @@
-"""Data models for BookFetch."""
+"""Core data models."""
 
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 
 class OutputFormat(str, Enum):
-    """Output format options."""
+    """Output format for downloaded books."""
 
     PDF = "pdf"
     JPG = "jpg"
-
-
-class DownloadStatus(str, Enum):
-    """Download status."""
-
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
-    FAILED = "failed"
-
-
-@dataclass
-class Book:
-    """Represents a book from Archive.org."""
-
-    url: str
-    book_id: str
-    title: str
-    pages: int
-    image_links: list[str] = field(default_factory=list)
-    metadata: Optional[dict] = None
-
-    @property
-    def safe_title(self) -> str:
-        """Get a filesystem-safe version of the title."""
-        from bookfetch.utils.validators import sanitize_filename
-
-        return sanitize_filename(self.title)
-
-
-@dataclass
-class DownloadConfig:
-    """Configuration for download operations."""
-
-    resolution: int = 3
-    threads: int = 50
-    output_format: OutputFormat = OutputFormat.PDF
-    output_dir: Path = Path("downloads")
-    save_metadata: bool = False
-    verbose: bool = True
-
-    def __post_init__(self) -> None:
-        """Validate configuration after initialization."""
-        if not isinstance(self.output_dir, Path):
-            self.output_dir = Path(self.output_dir)
-        if not isinstance(self.output_format, OutputFormat):
-            self.output_format = OutputFormat(self.output_format)
 
 
 @dataclass
@@ -67,8 +19,8 @@ class AuthCredentials:
     email: str
     password: str
 
-    def __post_init__(self) -> None:
-        """Validate credentials after initialization."""
+    def __post_init__(self):
+        """Validate credentials."""
         if not self.email or not self.password:
             from bookfetch.utils.exceptions import ValidationError
 
@@ -76,28 +28,44 @@ class AuthCredentials:
 
 
 @dataclass
-class DownloadJob:
-    """Represents a download job."""
+class DownloadConfig:
+    """Configuration for book download."""
 
-    book: Book
-    config: DownloadConfig
-    status: DownloadStatus = DownloadStatus.PENDING
-    output_path: Optional[Path] = None
-    error_message: Optional[str] = None
-    progress: int = 0  # Percentage (0-100)
+    resolution: int
+    threads: int
+    output_format: OutputFormat
+    output_dir: Path
+    save_metadata: bool = False
+    verbose: bool = False
 
-    def mark_completed(self, output_path: Path) -> None:
-        """Mark the job as completed."""
-        self.status = DownloadStatus.COMPLETED
-        self.output_path = output_path
-        self.progress = 100
 
-    def mark_failed(self, error_message: str) -> None:
-        """Mark the job as failed."""
-        self.status = DownloadStatus.FAILED
-        self.error_message = error_message
+@dataclass
+class Book:
+    """Represents a book on Archive.org."""
 
-    def mark_in_progress(self, progress: int = 0) -> None:
-        """Mark the job as in progress."""
-        self.status = DownloadStatus.IN_PROGRESS
-        self.progress = progress
+    url: str
+    book_id: str
+    title: str
+    pages: int
+    image_links: list[str]
+    metadata: dict = field(default_factory=dict)
+
+    @property
+    def safe_title(self) -> str:
+        """Get filesystem-safe title."""
+        from bookfetch.utils.validators import sanitize_filename
+
+        return sanitize_filename(self.title)
+
+
+@dataclass
+class SearchResult:
+    """Represents a search result from Archive.org."""
+
+    identifier: str
+    title: str
+    creator: str
+    date: str
+    item_size: int
+    image_count: int
+    downloads: int = 0

@@ -64,11 +64,12 @@ def sample_credentials():
 @pytest.fixture
 def sample_download_config(temp_output_dir):
     """Sample download configuration."""
-    from bookfetch.core.models import DownloadConfig
+    from bookfetch.core.models import DownloadConfig, OutputFormat
 
     return DownloadConfig(
         resolution=3,
         threads=10,
         output_dir=temp_output_dir,
+        output_format=OutputFormat.PDF,
         verbose=False,
     )
