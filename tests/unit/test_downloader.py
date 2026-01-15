@@ -1,8 +1,9 @@
 """Unit tests for ArchiveDownloader."""
 
 import pytest
-from unittest.mock import Mock, patch
 import requests
+from unittest.mock import Mock, patch
+
 from bookfetch.core.downloader import ArchiveDownloader
 from bookfetch.core.models import Book, OutputFormat
 from bookfetch.utils.exceptions import DownloadError
