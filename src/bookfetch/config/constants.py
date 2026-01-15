@@ -23,6 +23,7 @@ MAX_FILENAME_LENGTH = 150
 
 # HTTP headers
 DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Referer": "https://archive.org/",
     "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
     "Sec-Fetch-Site": "same-site",

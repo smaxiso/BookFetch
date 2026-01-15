@@ -20,7 +20,9 @@ class LoanManager:
         """
         self.session = session
 
-    def borrow_book(self, book_id: str, verbose: bool = True) -> requests.Session:
+    def borrow_book(
+        self, book_id: str, verbose: bool = True
+    ) -> tuple[requests.Session, str | None]:
         """Borrow a book from Archive.org.
 
         Args:
@@ -28,13 +30,16 @@ class LoanManager:
             verbose: If True, log borrow status
 
         Returns:
-            Updated session
+            Tuple of (session, token)
+            Token is None if book doesn't need borrowing or error occurs.
 
         Raises:
             LoanError: If borrowing fails
         """
         if verbose:
             logger.info(f"Attempting to borrow book: {book_id}")
+
+        # ... (implementation) ...
 
         # Grant access
         data = {"action": "grant_access", "identifier": book_id}
@@ -59,7 +64,7 @@ class LoanManager:
                     == "This book is not available to borrow at this time. Please try again later."
                 ):
                     logger.info("This book doesn't need to be borrowed")
-                    return self.session
+                    return self.session, None
                 else:
                     raise LoanError(f"Cannot borrow book: {error_msg}")
 
@@ -67,6 +72,7 @@ class LoanManager:
 
         except requests.RequestException as e:
             logger.error(f"Failed to browse book: {e}")
+            # If browse fails, we can't proceed with token creation
             raise LoanError(f"Failed to borrow book {book_id}: {e}") from e
 
         # Create token
@@ -77,10 +83,15 @@ class LoanManager:
             response.raise_for_status()
 
             if "token" in response.text:
+                token_data = response.json()
+                token = token_data.get("token")
                 if verbose:
                     logger.info(f"Successfully borrowed book: {book_id}")
-                return self.session
+                    logger.debug(f"Loan token response: {response.text}")
+                    logger.debug(f"Session cookies: {self.session.cookies.get_dict()}")
+                return self.session, token
             else:
+                logger.error(f"Failed to create token. Response: {response.text}")
                 raise LoanError(
                     "Failed to create token. You may not have permission to borrow this book."
                 )

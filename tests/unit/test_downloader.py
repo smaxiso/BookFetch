@@ -95,7 +95,7 @@ class TestArchiveDownloader:
         with pytest.raises(DownloadError) as exc_info:
             mock_downloader.get_book_info(sample_book_url)
 
-        assert "No image links found" in str(exc_info.value)
+        assert "Could not find readable book content" in str(exc_info.value)
 
     def test_get_book_info_network_error(self, mock_downloader, sample_book_url):
         """Test book info extraction with network error."""
@@ -104,7 +104,7 @@ class TestArchiveDownloader:
         with pytest.raises(DownloadError) as exc_info:
             mock_downloader.get_book_info(sample_book_url)
 
-        assert "Failed to fetch book information" in str(exc_info.value)
+        assert "Failed to fetch book info" in str(exc_info.value)
 
     def test_get_book_info_parse_error(self, mock_downloader, sample_book_url):
         """Test book info extraction with parse error."""
@@ -117,7 +117,8 @@ class TestArchiveDownloader:
         with pytest.raises(DownloadError) as exc_info:
             mock_downloader.get_book_info(sample_book_url)
 
-        assert "Failed to extract book information" in str(exc_info.value)
+        # It falls back to metadata search which fails
+        assert "Could not find readable book content" in str(exc_info.value)
 
     @patch("bookfetch.core.downloader.get_unique_output_path")
     @patch("bookfetch.core.downloader.create_pdf_from_images")
@@ -161,7 +162,7 @@ class TestArchiveDownloader:
             ],
         ):
             # Mock loan manager
-            mock_downloader.loan_manager.borrow_book = Mock()
+            mock_downloader.loan_manager.borrow_book = Mock(return_value=(None, "token"))
             mock_downloader.loan_manager.return_book = Mock()
 
             result = mock_downloader.download_book(book)
@@ -196,7 +197,7 @@ class TestArchiveDownloader:
             "_download_images",
             return_value=[temp_dir / "0001.jpg", temp_dir / "0002.jpg"],
         ):
-            mock_downloader.loan_manager.borrow_book = Mock()
+            mock_downloader.loan_manager.borrow_book = Mock(return_value=(None, "token"))
             mock_downloader.loan_manager.return_book = Mock()
 
             result = mock_downloader.download_book(book)
@@ -220,7 +221,7 @@ class TestArchiveDownloader:
         with patch.object(
             mock_downloader, "_download_images", side_effect=Exception("Download failed")
         ):
-            mock_downloader.loan_manager.borrow_book = Mock()
+            mock_downloader.loan_manager.borrow_book = Mock(return_value=(None, "token"))
             mock_downloader.loan_manager.return_book = Mock()
 
             with pytest.raises(DownloadError) as exc_info:

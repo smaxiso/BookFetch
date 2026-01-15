@@ -18,7 +18,7 @@ from bookfetch.utils.logger import setup_logger
 from bookfetch.utils.validators import validate_archive_urls
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.version_option(version=__version__, prog_name="bookfetch")
 @click.option("-v", "--verbose", is_flag=True, help="Enable verbose logging")
 @click.pass_context
@@ -26,12 +26,20 @@ def cli(ctx: click.Context, verbose: bool) -> None:
     """BookFetch - Professional Archive.org book downloader.
 
     Download books from Archive.org and convert EPUB files to PDF format.
+    Run without arguments to start Interactive Mode.
     """
     ctx.ensure_object(dict)
     ctx.obj["verbose"] = verbose
 
     # Setup logging
     setup_logger(verbose=verbose)
+
+    # Launch interactive mode if no subcommand is invoked
+    if ctx.invoked_subcommand is None:
+        from bookfetch.interactive import InteractiveSession
+
+        session = InteractiveSession(ctx)
+        session.start()
 
 
 @cli.command()
@@ -70,16 +78,24 @@ def search(ctx: click.Context, query: str, limit: int, download: bool) -> None:
 
         # Print detailed results
         click.echo(f"\nFound {len(results)} results:\n")
-        click.echo(f"{'INDEX':<6} {'ID':<25} {'TITLE':<40} {'PAGES':<8} {'SIZE':<10} {'YEAR'}")
-        click.echo("-" * 100)
+        click.echo(
+            f"{'INDEX':<6} {'ID':<25} {'TITLE':<35} {'ACCESS':<12} {'PAGES':<8} {'SIZE':<10} {'YEAR'}"
+        )
+        click.echo("-" * 115)
 
         for i, res in enumerate(results, 1):
-            title = res.title[:37] + "..." if len(res.title) > 37 else res.title
+            title = res.title[:32] + "..." if len(res.title) > 32 else res.title
             size_mb = f"{res.item_size / (1024 * 1024):.1f}MB" if res.item_size else "?"
-            click.echo(
-                f"{i:<6} {res.identifier:<25} {title:<40} {res.image_count:<8} {size_mb:<10} {res.date}"
+
+            access_color = "red" if res.is_restricted else "green"
+            access_text = click.style(
+                "Restricted" if res.is_restricted else "Free", fg=access_color
             )
-        click.echo("-" * 100)
+
+            click.echo(
+                f"{i:<6} {res.identifier:<25} {title:<35} {access_text:<21} {res.image_count:<8} {size_mb:<10} {res.date}"
+            )
+        click.echo("-" * 115)
 
         # Interactive download flow
         if download:
@@ -92,15 +108,37 @@ def search(ctx: click.Context, query: str, limit: int, download: bool) -> None:
 
             # Determine book ID
             book_id = ""
+            selected_result = None
             if choice.isdigit():
                 idx = int(choice)
                 if 1 <= idx <= len(results):
-                    book_id = results[idx - 1].identifier
-                    click.echo(f"Selected: {results[idx - 1].title}")
+                    selected_result = results[idx - 1]
+                    book_id = selected_result.identifier
+                    click.echo(f"Selected: {selected_result.title}")
             else:
                 book_id = choice  # User typed ID directly
+                # Try to find result object for warning
+                for r in results:
+                    if r.identifier == book_id:
+                        selected_result = r
+                        break
 
             if book_id:
+                # Warn if restricted
+                if selected_result and selected_result.is_restricted:
+                    click.echo(
+                        "\n⚠️  WARNING: This book is designated as 'Restricted' (Limited Preview).",
+                        err=True,
+                    )
+                    click.echo("   Downloads will likely contain placeholder pages only.", err=True)
+                    click.echo(
+                        "   To view the full book, you must borrow it on the Archive.org website directly.",
+                        err=True,
+                    )
+                    if not click.confirm("   Do you want to proceed with the download anyway?"):
+                        click.echo("❌ Aborted.")
+                        sys.exit(0)
+
                 # Invoke interactive download command
                 ctx.invoke(download_command, urls=(book_id,))
             else:
@@ -173,6 +211,12 @@ def search(ctx: click.Context, query: str, limit: int, download: bool) -> None:
     is_flag=True,
     help="Save book metadata to JSON file",
 )
+@click.option(
+    "--interactive",
+    is_flag=True,
+    hidden=True,
+    help="Internal flag for interactive mode",
+)
 @click.pass_context
 def download_command(
     ctx: click.Context,
@@ -185,6 +229,7 @@ def download_command(
     output_dir: Optional[Path],
     output_format: Optional[str],
     save_metadata: bool,
+    interactive: bool,
 ) -> None:
     """Download books from Archive.org."""
     try:
@@ -214,6 +259,8 @@ def download_command(
 
         if not url_list:
             click.echo("Error: At least one URL required (use --url or --file)", err=True)
+            if interactive:
+                return
             sys.exit(1)
 
         # Validate URLs
@@ -221,6 +268,8 @@ def download_command(
             validate_archive_urls(url_list)
         except Exception as e:
             click.echo(f"Error: {e}", err=True)
+            if interactive:
+                return
             sys.exit(1)
 
         # Build configuration
@@ -259,6 +308,25 @@ def download_command(
                 # Get book info
                 book = downloader.get_book_info(url)
 
+                # Check for restricted status and warn
+                if book.is_restricted:
+                    click.echo(
+                        "\n⚠️  WARNING: This book is designated as 'Restricted' (Limited Preview).",
+                        err=True,
+                    )
+                    click.echo("   Downloads will likely contain placeholder pages only.", err=True)
+                    # For bulk/direct download logic, we might proceed or ask confirmation.
+                    # Since this might be part of a bulk list, prompting for every book might be annoying,
+                    # but safety first?
+                    # Let's confirm only if it's an interactive session (which it always is via CLI, but could be piped)
+                    # We'll just warn loudly and maybe pause slightly?
+                    # Or better, prompt.
+                    if not click.confirm(
+                        "   Do you want to proceed with downloading this restricted book?"
+                    ):
+                        click.echo("⏭️  Skipping.")
+                        continue
+
                 # Download
                 output_path = downloader.download_book(book)
 
@@ -273,9 +341,13 @@ def download_command(
 
     except BookFetchError as e:
         click.echo(f"Error: {e}", err=True)
+        if interactive:
+            return
         sys.exit(1)
     except KeyboardInterrupt:
         click.echo("\n\n⚠️  Download cancelled by user", err=True)
+        if interactive:
+            return
         sys.exit(130)
     except Exception as e:
         click.echo(f"Unexpected error: {e}", err=True)
@@ -283,6 +355,8 @@ def download_command(
             import traceback
 
             traceback.print_exc()
+        if interactive:
+            return
         sys.exit(1)
 
 

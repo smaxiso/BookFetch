@@ -68,7 +68,7 @@ class TestArchiveSearcher:
     def test_search_limit(self, searcher, mock_search_items):
         """Test search limit."""
         # Create mock iterator that returns 20 items
-        mock_items = [{"identifier": f"book{i}"} for i in range(20)]
+        mock_items = [{"identifier": f"book{i}", "imagecount": 10, "item_size": 100} for i in range(20)]
         mock_results = MagicMock()
         mock_results.iter_as_results.return_value = mock_items
         mock_search_items.return_value = mock_results
@@ -99,11 +99,11 @@ class TestArchiveSearcher:
     def test_search_malformed_result(self, searcher, mock_search_items):
         """Test handling of malformed search results."""
         # One valid, one invalid result
-        mock_item1 = {"identifier": "book1", "title": "Book 1"}
+        mock_item1 = {"identifier": "book1", "title": "Book 1", "imagecount": 10, "item_size": 100}
         # mock_item2 would be invalid handling
 
         # A simpler test for robust parsing: missing fields should have defaults
-        mock_item3 = {"identifier": "book3"}  # Missing title, creator etc
+        mock_item3 = {"identifier": "book3", "imagecount": 5, "item_size": 50}  # Missing title, creator etc
 
         mock_results = MagicMock()
         mock_results.iter_as_results.return_value = [mock_item1, mock_item3]

@@ -48,7 +48,10 @@ class Book:
     title: str
     pages: int
     image_links: list[str]
+
     metadata: dict = field(default_factory=dict)
+    is_restricted: bool = False
+    direct_url: str | None = None
 
     @property
     def safe_title(self) -> str:
@@ -69,3 +72,4 @@ class SearchResult:
     item_size: int
     image_count: int
     downloads: int = 0
+    is_restricted: bool = False
